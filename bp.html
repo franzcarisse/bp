@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Proposal Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Budget Proposal Manager</h1>
+            <p class="text-gray-600">Create, store, and manage your budget proposals</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-white rounded-lg shadow-md p-1 flex">
+                <button id="newProposalBtn" class="px-6 py-2 rounded-md bg-blue-600 text-white font-medium transition-all">
+                    New Proposal
+                </button>
+                <button id="viewProposalsBtn" class="px-6 py-2 rounded-md text-gray-600 hover:bg-gray-100 font-medium transition-all">
+                    View All (<span id="proposalCount">0</span>)
+                </button>
+            </div>
+        </div>
+
+        <!-- New Proposal Form -->
+        <div id="proposalForm" class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Create New Budget Proposal</h2>
+            
+            <form id="budgetForm">
+                <!-- Basic Information -->
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Project Name *</label>
+                        <input type="text" id="projectName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Department *</label>
+                        <select id="department" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Department</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="IT">IT</option>
+                            <option value="HR">Human Resources</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Finance">Finance</option>
+                            <option value="R&D">Research & Development</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Requested By *</label>
+                        <input type="text" id="requestedBy" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Priority Level *</label>
+                        <select id="priority" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Priority</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Budget Items -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-800">Budget Items</h3>
+                        <button type="button" id="addItemBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            + Add Item
+                        </button>
+                    </div>
+                    
+                    <div id="budgetItems" class="space-y-4">
+                        <div class="budget-item bg-gray-50 p-4 rounded-lg">
+                            <div class="grid md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Item Description</label>
+                                    <input type="text" class="item-description w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                    <select class="item-category w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Equipment">Equipment</option>
+                                        <option value="Software">Software</option>
+                                        <option value="Personnel">Personnel</option>
+                                        <option value="Travel">Travel</option>
+                                        <option value="Training">Training</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Amount ($)</label>
+                                    <input type="number" class="item-amount w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" min="0" step="0.01" required>
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="button" class="remove-item bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition-colors">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Justification -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Justification *</label>
+                    <textarea id="justification" required rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Explain why this budget is needed..."></textarea>
+                </div>
+
+                <!-- Total Display -->
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-medium text-gray-700">Total Budget Request:</span>
+                        <span id="totalAmount" class="text-2xl font-bold text-blue-600">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                        Submit Proposal
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Proposals List -->
+        <div id="proposalsList" class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-8 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">All Budget Proposals</h2>
+                <div class="flex gap-2">
+                    <select id="filterDepartment" class="px-3 py-2 border border-gray-300 rounded-lg">
+                        <option value="">All Departments</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="IT">IT</option>
+                        <option value="HR">Human Resources</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Finance">Finance</option>
+                        <option value="R&D">Research & Development</option>
+                    </select>
+                    <select id="filterPriority" class="px-3 py-2 border border-gray-300 rounded-lg">
+                        <option value="">All Priorities</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="proposalsContainer" class="space-y-4">
+                <!-- Proposals will be displayed here -->
+            </div>
+            
+            <div id="noProposals" class="text-center py-12 text-gray-500">
+                <div class="text-6xl mb-4">📋</div>
+                <h3 class="text-xl font-medium mb-2">No proposals yet</h3>
+                <p>Create your first budget proposal to get started!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Database simulation using localStorage
+        class ProposalDatabase {
+            constructor() {
+                this.storageKey = 'budgetProposals';
+            }
+
+            save(proposal) {
+                const proposals = this.getAll();
+                proposal.id = Date.now().toString();
+                proposal.createdAt = new Date().toISOString();
+                proposal.status = 'Pending';
+                proposals.push(proposal);
+                localStorage.setItem(this.storageKey, JSON.stringify(proposals));
+                return proposal;
+            }
+
+            getAll() {
+                const data = localStorage.getItem(this.storageKey);
+                return data ? JSON.parse(data) : [];
+            }
+
+            delete(id) {
+                const proposals = this.getAll();
+                const filtered = proposals.filter(p => p.id !== id);
+                localStorage.setItem(this.storageKey, JSON.stringify(filtered));
+            }
+
+            updateStatus(id, status) {
+                const proposals = this.getAll();
+                const proposal = proposals.find(p => p.id === id);
+                if (proposal) {
+                    proposal.status = status;
+                    localStorage.setItem(this.storageKey, JSON.stringify(proposals));
+                }
+            }
+        }
+
+        const db = new ProposalDatabase();
+
+        // DOM elements
+        const newProposalBtn = document.getElementById('newProposalBtn');
+        const viewProposalsBtn = document.getElementById('viewProposalsBtn');
+        const proposalForm = document.getElementById('proposalForm');
+        const proposalsList = document.getElementById('proposalsList');
+        const budgetForm = document.getElementById('budgetForm');
+        const addItemBtn = document.getElementById('addItemBtn');
+        const budgetItems = document.getElementById('budgetItems');
+        const totalAmount = document.getElementById('totalAmount');
+        const proposalCount = document.getElementById('proposalCount');
+
+        // Navigation
+        newProposalBtn.addEventListener('click', () => {
+            newProposalBtn.classList.add('bg-blue-600', 'text-white');
+            newProposalBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+            viewProposalsBtn.classList.remove('bg-blue-600', 'text-white');
+            viewProposalsBtn.classList.add('text-gray-600', 'hover:bg-gray-100');
+            
+            proposalForm.classList.remove('hidden');
+            proposalsList.classList.add('hidden');
+        });
+
+        viewProposalsBtn.addEventListener('click', () => {
+            viewProposalsBtn.classList.add('bg-blue-600', 'text-white');
+            viewProposalsBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+            newProposalBtn.classList.remove('bg-blue-600', 'text-white');
+            newProposalBtn.classList.add('text-gray-600', 'hover:bg-gray-100');
+            
+            proposalForm.classList.add('hidden');
+            proposalsList.classList.remove('hidden');
+            displayProposals();
+        });
+
+        // Add budget item
+        addItemBtn.addEventListener('click', () => {
+            const itemHtml = `
+                <div class="budget-item bg-gray-50 p-4 rounded-lg fade-in">
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Item Description</label>
+                            <input type="text" class="item-description w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select class="item-category w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                <option value="">Select Category</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Software">Software</option>
+                                <option value="Personnel">Personnel</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Training">Training</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Amount ($)</label>
+                            <input type="number" class="item-amount w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" min="0" step="0.01" required>
+                        </div>
+                        <div class="flex items-end">
+                            <button type="button" class="remove-item bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition-colors">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            budgetItems.insertAdjacentHTML('beforeend', itemHtml);
+            updateTotal();
+        });
+
+        // Remove budget item
+        budgetItems.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-item')) {
+                const items = document.querySelectorAll('.budget-item');
+                if (items.length > 1) {
+                    e.target.closest('.budget-item').remove();
+                    updateTotal();
+                }
+            }
+        });
+
+        // Update total when amounts change
+        budgetItems.addEventListener('input', (e) => {
+            if (e.target.classList.contains('item-amount')) {
+                updateTotal();
+            }
+        });
+
+        function updateTotal() {
+            const amounts = document.querySelectorAll('.item-amount');
+            let total = 0;
+            amounts.forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                total += value;
+            });
+            totalAmount.textContent = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        // Form submission
+        budgetForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                projectName: document.getElementById('projectName').value,
+                department: document.getElementById('department').value,
+                requestedBy: document.getElementById('requestedBy').value,
+                priority: document.getElementById('priority').value,
+                justification: document.getElementById('justification').value,
+                items: [],
+                total: 0
+            };
+
+            // Collect budget items
+            const items = document.querySelectorAll('.budget-item');
+            items.forEach(item => {
+                const description = item.querySelector('.item-description').value;
+                const category = item.querySelector('.item-category').value;
+                const amount = parseFloat(item.querySelector('.item-amount').value) || 0;
+                
+                if (description && category && amount > 0) {
+                    formData.items.push({ description, category, amount });
+                    formData.total += amount;
+                }
+            });
+
+            // Save to database
+            const savedProposal = db.save(formData);
+            
+            // Generate DBM BP Form 202
+            generateDBMForm202(savedProposal);
+            
+            // Show success message
+            alert('Budget proposal submitted successfully! DBM Form 202 has been generated.');
+            
+            // Reset form
+            budgetForm.reset();
+            
+            // Reset budget items to just one
+            budgetItems.innerHTML = `
+                <div class="budget-item bg-gray-50 p-4 rounded-lg">
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Item Description</label>
+                            <input type="text" class="item-description w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select class="item-category w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                <option value="">Select Category</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Software">Software</option>
+                                <option value="Personnel">Personnel</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Training">Training</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Amount ($)</label>
+                            <input type="number" class="item-amount w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" min="0" step="0.01" required>
+                        </div>
+                        <div class="flex items-end">
+                            <button type="button" class="remove-item bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition-colors">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            updateTotal();
+            updateProposalCount();
+        });
+
+        // Display proposals
+        function displayProposals(filter = {}) {
+            const proposals = db.getAll();
+            const container = document.getElementById('proposalsContainer');
+            const noProposals = document.getElementById('noProposals');
+            
+            let filteredProposals = proposals;
+            
+            if (filter.department) {
+                filteredProposals = filteredProposals.filter(p => p.department === filter.department);
+            }
+            
+            if (filter.priority) {
+                filteredProposals = filteredProposals.filter(p => p.priority === filter.priority);
+            }
+            
+            if (filteredProposals.length === 0) {
+                container.innerHTML = '';
+                noProposals.classList.remove('hidden');
+                return;
+            }
+            
+            noProposals.classList.add('hidden');
+            
+            container.innerHTML = filteredProposals.map(proposal => `
+                <div class="proposal-card bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800">${proposal.projectName}</h3>
+                            <p class="text-gray-600">${proposal.department} • Requested by ${proposal.requestedBy}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-blue-600">$${proposal.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="px-2 py-1 text-xs rounded-full ${getPriorityColor(proposal.priority)}">${proposal.priority}</span>
+                                <span class="px-2 py-1 text-xs rounded-full ${getStatusColor(proposal.status)}">${proposal.status}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-medium text-gray-700 mb-2">Budget Items:</h4>
+                        <div class="space-y-1">
+                            ${proposal.items.map(item => `
+                                <div class="flex justify-between text-sm">
+                                    <span>${item.description} (${item.category})</span>
+                                    <span class="font-medium">$${item.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-medium text-gray-700 mb-1">Justification:</h4>
+                        <p class="text-sm text-gray-600">${proposal.justification}</p>
+                    </div>
+                    
+                    <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
+                        <span>Created: ${new Date(proposal.createdAt).toLocaleDateString()}</span>
+                        <span>ID: ${proposal.id}</span>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="generateDBMForm202(${JSON.stringify(proposal).replace(/"/g, '&quot;')})" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors">
+                            Generate DBM Form 202
+                        </button>
+                        <button onclick="updateProposalStatus('${proposal.id}', 'Approved')" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors">
+                            Approve
+                        </button>
+                        <button onclick="updateProposalStatus('${proposal.id}', 'Rejected')" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors">
+                            Reject
+                        </button>
+                        <button onclick="deleteProposal('${proposal.id}')" class="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getPriorityColor(priority) {
+            switch(priority) {
+                case 'High': return 'bg-red-100 text-red-800';
+                case 'Medium': return 'bg-yellow-100 text-yellow-800';
+                case 'Low': return 'bg-green-100 text-green-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Approved': return 'bg-green-100 text-green-800';
+                case 'Rejected': return 'bg-red-100 text-red-800';
+                case 'Pending': return 'bg-blue-100 text-blue-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function updateProposalStatus(id, status) {
+            db.updateStatus(id, status);
+            displayProposals();
+        }
+
+        function deleteProposal(id) {
+            if (confirm('Are you sure you want to delete this proposal?')) {
+                db.delete(id);
+                displayProposals();
+                updateProposalCount();
+            }
+        }
+
+        function updateProposalCount() {
+            const count = db.getAll().length;
+            proposalCount.textContent = count;
+        }
+
+        // Generate DBM BP Form 202
+        function generateDBMForm202(proposal) {
+            const formWindow = window.open('', '_blank', 'width=900,height=1200');
+            const currentDate = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            formWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>DBM BP Form 202 - ${proposal.projectName}</title>
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 0.75in;
+                        }
+                        body { 
+                            font-family: 'Times New Roman', serif; 
+                            margin: 0;
+                            padding: 20px;
+                            line-height: 1.3;
+                            color: #000;
+                            font-size: 12px;
+                            background: white;
+                        }
+                        .page-container {
+                            max-width: 8.5in;
+                            margin: 0 auto;
+                            background: white;
+                            min-height: 11in;
+                        }
+                        .header { 
+                            text-align: center; 
+                            margin-bottom: 25px;
+                            border: 2px solid #000;
+                            padding: 15px;
+                            background: #f8f8f8;
+                        }
+                        .republic-title {
+                            font-size: 14px;
+                            font-weight: bold;
+                            margin: 0;
+                            letter-spacing: 1px;
+                        }
+                        .dbm-title {
+                            font-size: 12px;
+                            margin: 2px 0 8px 0;
+                            font-weight: normal;
+                        }
+                        .form-title { 
+                            font-size: 16px; 
+                            font-weight: bold; 
+                            margin: 8px 0 5px 0;
+                            text-decoration: underline;
+                        }
+                        .form-number { 
+                            font-size: 11px; 
+                            margin: 0;
+                            font-style: italic;
+                        }
+                        .section { 
+                            margin: 15px 0; 
+                            border: 2px solid #000;
+                            page-break-inside: avoid;
+                        }
+                        .section-title { 
+                            font-weight: bold; 
+                            font-size: 12px;
+                            background: #e8e8e8;
+                            padding: 8px 12px;
+                            margin: 0;
+                            border-bottom: 1px solid #000;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        .section-content {
+                            padding: 12px;
+                        }
+                        .field-row { 
+                            display: table;
+                            width: 100%;
+                            margin: 6px 0;
+                        }
+                        .field-label { 
+                            display: table-cell;
+                            font-weight: bold; 
+                            width: 180px;
+                            vertical-align: top;
+                            padding-right: 10px;
+                        }
+                        .field-value { 
+                            display: table-cell;
+                            border-bottom: 1px solid #000;
+                            padding: 3px 8px;
+                            min-height: 20px;
+                            vertical-align: top;
+                        }
+                        .two-column {
+                            display: table;
+                            width: 100%;
+                            table-layout: fixed;
+                        }
+                        .column {
+                            display: table-cell;
+                            width: 50%;
+                            padding-right: 15px;
+                            vertical-align: top;
+                        }
+                        .column:last-child {
+                            padding-right: 0;
+                            padding-left: 15px;
+                        }
+                        .budget-table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin: 10px 0;
+                            font-size: 11px;
+                        }
+                        .budget-table th, .budget-table td { 
+                            border: 1px solid #000; 
+                            padding: 6px 8px; 
+                            text-align: left;
+                            vertical-align: top;
+                        }
+                        .budget-table th { 
+                            background: #d8d8d8; 
+                            font-weight: bold;
+                            text-align: center;
+                            font-size: 10px;
+                            text-transform: uppercase;
+                        }
+                        .budget-table td.number {
+                            text-align: right;
+                            font-family: 'Courier New', monospace;
+                        }
+                        .total-row { 
+                            font-weight: bold; 
+                            background: #f0f0f0;
+                            border-top: 2px solid #000;
+                        }
+                        .justification-box {
+                            border: 1px solid #000;
+                            padding: 12px;
+                            min-height: 80px;
+                            background: #fafafa;
+                            text-align: justify;
+                            line-height: 1.4;
+                        }
+                        .signature-section { 
+                            margin-top: 30px;
+                            display: table;
+                            width: 100%;
+                            table-layout: fixed;
+                        }
+                        .signature-box { 
+                            display: table-cell;
+                            width: 33.33%;
+                            text-align: center;
+                            padding: 0 10px;
+                            vertical-align: top;
+                        }
+                        .signature-line { 
+                            border-bottom: 1px solid #000;
+                            height: 35px;
+                            margin: 25px 0 8px 0;
+                        }
+                        .signature-title {
+                            font-weight: bold;
+                            font-size: 10px;
+                            margin-bottom: 3px;
+                        }
+                        .signature-name {
+                            font-size: 11px;
+                            margin: 2px 0;
+                        }
+                        .signature-position {
+                            font-size: 10px;
+                            font-style: italic;
+                            color: #666;
+                        }
+                        .print-btn { 
+                            position: fixed;
+                            top: 15px;
+                            right: 15px;
+                            background: #1e40af;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            cursor: pointer;
+                            border-radius: 6px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                            z-index: 1000;
+                        }
+                        .print-btn:hover {
+                            background: #1d4ed8;
+                        }
+                        .footer-info {
+                            margin-top: 30px;
+                            padding-top: 15px;
+                            border-top: 1px solid #ccc;
+                            font-size: 9px;
+                            text-align: center;
+                            color: #666;
+                            line-height: 1.2;
+                        }
+                        .amount-words {
+                            font-style: italic;
+                            font-size: 11px;
+                            color: #555;
+                            margin-top: 5px;
+                        }
+                        @media print {
+                            .print-btn { display: none; }
+                            body { 
+                                margin: 0; 
+                                padding: 0;
+                                font-size: 11px;
+                            }
+                            .page-container {
+                                margin: 0;
+                                padding: 0;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="page-container">
+                        <button class="print-btn" onclick="window.print()">🖨️ Print Form</button>
+                        
+                        <div class="header">
+                            <div class="republic-title">REPUBLIC OF THE PHILIPPINES</div>
+                            <div class="dbm-title">DEPARTMENT OF BUDGET AND MANAGEMENT</div>
+                            <div class="form-title">BUDGET PROPOSAL</div>
+                            <div class="form-number">DBM Form No. 202</div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">I. Agency Information</div>
+                            <div class="section-content">
+                                <div class="two-column">
+                                    <div class="column">
+                                        <div class="field-row">
+                                            <span class="field-label">Agency/Department:</span>
+                                            <span class="field-value">${proposal.department}</span>
+                                        </div>
+                                        <div class="field-row">
+                                            <span class="field-label">Date Submitted:</span>
+                                            <span class="field-value">${currentDate}</span>
+                                        </div>
+                                    </div>
+                                    <div class="column">
+                                        <div class="field-row">
+                                            <span class="field-label">Proposal ID:</span>
+                                            <span class="field-value">${proposal.id}</span>
+                                        </div>
+                                        <div class="field-row">
+                                            <span class="field-label">Fiscal Year:</span>
+                                            <span class="field-value">${new Date().getFullYear()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">II. Project Details</div>
+                            <div class="section-content">
+                                <div class="field-row">
+                                    <span class="field-label">Project Name:</span>
+                                    <span class="field-value">${proposal.projectName}</span>
+                                </div>
+                                <div class="two-column">
+                                    <div class="column">
+                                        <div class="field-row">
+                                            <span class="field-label">Requested By:</span>
+                                            <span class="field-value">${proposal.requestedBy}</span>
+                                        </div>
+                                        <div class="field-row">
+                                            <span class="field-label">Priority Level:</span>
+                                            <span class="field-value">${proposal.priority}</span>
+                                        </div>
+                                    </div>
+                                    <div class="column">
+                                        <div class="field-row">
+                                            <span class="field-label">Current Status:</span>
+                                            <span class="field-value">${proposal.status}</span>
+                                        </div>
+                                        <div class="field-row">
+                                            <span class="field-label">Implementation Period:</span>
+                                            <span class="field-value">_________________</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">III. Budget Breakdown</div>
+                            <div class="section-content">
+                                <table class="budget-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%">No.</th>
+                                            <th style="width: 40%">Item Description</th>
+                                            <th style="width: 20%">Category</th>
+                                            <th style="width: 20%">Amount (₱)</th>
+                                            <th style="width: 15%">Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${proposal.items.map((item, index) => {
+                                            const percentage = ((item.amount / proposal.total) * 100).toFixed(1);
+                                            return `
+                                                <tr>
+                                                    <td style="text-align: center;">${index + 1}</td>
+                                                    <td>${item.description}</td>
+                                                    <td style="text-align: center;">${item.category}</td>
+                                                    <td class="number">₱${item.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                                    <td class="number">${percentage}%</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                        <tr class="total-row">
+                                            <td colspan="3" style="text-align: center;"><strong>TOTAL BUDGET REQUEST</strong></td>
+                                            <td class="number"><strong>₱${proposal.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></td>
+                                            <td class="number"><strong>100.0%</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="amount-words">
+                                    Amount in words: ${numberToWords(proposal.total)} pesos only
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">IV. Project Justification</div>
+                            <div class="section-content">
+                                <div class="justification-box">
+                                    ${proposal.justification}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">V. Budget Summary & Analysis</div>
+                            <div class="section-content">
+                                <div class="two-column">
+                                    <div class="column">
+                                        <div class="field-row">
+                                            <span class="field-label">Total Amount:</span>
+                                            <span class="field-value">₱${proposal.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                                        </div>
+                                        <div class="field-row">
+                                            <span class="field-label">Number of Items:</span>
+                                            <span class="field-value">${proposal.items.length}</span>
+                                        </div>
+                                    </div>
+                                    <div class="column">
+                                        <div class="field-row">
+                                            <span class="field-label">Largest Item:</span>
+                                            <span class="field-value">₱${Math.max(...proposal.items.map(item => item.amount)).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                                        </div>
+                                        <div class="field-row">
+                                            <span class="field-label">Average per Item:</span>
+                                            <span class="field-value">₱${(proposal.total / proposal.items.length).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="signature-section">
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div class="signature-title">PREPARED BY:</div>
+                                <div class="signature-name">${proposal.requestedBy}</div>
+                                <div class="signature-position">${proposal.department}</div>
+                                <div class="signature-position">Date: ${currentDate}</div>
+                            </div>
+                            
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div class="signature-title">REVIEWED BY:</div>
+                                <div class="signature-name">_________________</div>
+                                <div class="signature-position">Department Head</div>
+                                <div class="signature-position">Date: _____________</div>
+                            </div>
+                            
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div class="signature-title">APPROVED BY:</div>
+                                <div class="signature-name">_________________</div>
+                                <div class="signature-position">Budget Officer</div>
+                                <div class="signature-position">Date: _____________</div>
+                            </div>
+                        </div>
+
+                        <div class="footer-info">
+                            <p><strong>DBM Form 202 - Budget Proposal Form</strong></p>
+                            <p>Generated on ${currentDate} | Proposal ID: ${proposal.id} | System Generated Document</p>
+                            <p>This document is an official budget proposal submitted to the Department of Budget and Management</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            formWindow.document.close();
+        }
+
+        // Helper function to convert numbers to words
+        function numberToWords(num) {
+            if (num === 0) return 'zero';
+            
+            const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+            const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+            const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+            const thousands = ['', 'thousand', 'million', 'billion'];
+            
+            function convertHundreds(n) {
+                let result = '';
+                if (n >= 100) {
+                    result += ones[Math.floor(n / 100)] + ' hundred ';
+                    n %= 100;
+                }
+                if (n >= 20) {
+                    result += tens[Math.floor(n / 10)] + ' ';
+                    n %= 10;
+                }
+                if (n >= 10) {
+                    result += teens[n - 10] + ' ';
+                } else if (n > 0) {
+                    result += ones[n] + ' ';
+                }
+                return result;
+            }
+            
+            let result = '';
+            let thousandIndex = 0;
+            
+            while (num > 0) {
+                if (num % 1000 !== 0) {
+                    result = convertHundreds(num % 1000) + thousands[thousandIndex] + ' ' + result;
+                }
+                num = Math.floor(num / 1000);
+                thousandIndex++;
+            }
+            
+            return result.trim();
+        }
+
+        // Filters
+        document.getElementById('filterDepartment').addEventListener('change', applyFilters);
+        document.getElementById('filterPriority').addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            const department = document.getElementById('filterDepartment').value;
+            const priority = document.getElementById('filterPriority').value;
+            displayProposals({ department, priority });
+        }
+
+        // Initialize
+        updateTotal();
+        updateProposalCount();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'975239ec10ccfec4',t:'MTc1NjE5OTc0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
